@@ -4,6 +4,7 @@ This repository contains Terraform configuration for AWS infrastructure deployme
 
 ### Infrastructure Overview
 
+
 The project uses Terraform v1.12.1 to provision AWS resources with state stored in an S3 bucket. GitHub Actions automates the deployment process through OIDC authentication. This Terraform configuration creates a VPC with multi-AZ deployment across two availability zones in one AWS region.
 
 ```
