@@ -1,7 +1,7 @@
 resource "aws_security_group" "security_group" {
-  name   = "resource_with_dynamic_block"
+  name        = "resource_with_dynamic_block"
   description = "Allow TLS inbound traffic"
-  vpc_id = aws_vpc.ec2_vpc.id
+  vpc_id      = aws_vpc.ec2_vpc.id
 
   dynamic "ingress" {
     for_each = local.ingress_rules

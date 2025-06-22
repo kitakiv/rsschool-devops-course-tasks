@@ -4,7 +4,7 @@ This repository contains Terraform configuration for AWS infrastructure deployme
 
 ### Infrastructure Overview
 
-The project uses Terraform v1.12.1 to provision AWS resources with state stored in an S3 bucket. GitHub Actions automates the deployment process through OIDC authentication.
+The project uses Terraform v1.12.1 to provision AWS resources with state stored in an S3 bucket. GitHub Actions automates the deployment process through OIDC authentication. This Terraform configuration creates a VPC with multi-AZ deployment across two availability zones in one AWS region.
 
 ```
 terraform >=  v1.12.1
@@ -69,3 +69,50 @@ GitHub Actions uses OIDC (OpenID Connect) to authenticate with AWS, take the rol
 4. Create pull requests for changes
 
 5. Merge to main branch to trigger deployment
+
+### Infrastructure Components
+VPC Configuration
+VPC: Single VPC in one AWS region
+
+CIDR Block: 10.0.0.0/16
+
+Availability Zones: 2 AZs (eu-west-1a, eu-west-1b)
+
+Subnet Architecture
+Region: eu-west-1
+├── AZ: eu-west-1a
+│   ├── Public Subnet 1 (10.0.1.0/24)
+│   └── Private Subnet 1 (10.0.3.0/24)
+└── AZ: eu-west-1b
+    ├── Public Subnet 2 (10.0.2.0/24)
+    └── Private Subnet 2 (10.0.4.0/24)
+
+Copy
+EC2 Instances
+4 EC2 instances total:
+
+2 instances in public subnets (one per AZ)
+
+2 instances in private subnets (one per AZ)
+
+Instance Type: t2.micro
+
+AMI: Ubuntu (ami-01f23391a59163da9)
+
+#### Network Connectivity
+Internet Gateway: Provides internet access for public subnets
+
+NAT Gateway: Enables outbound internet access for private subnets
+
+#### Route Tables:
+
+Public route table with internet gateway route
+
+Private route table with NAT gateway route
+
+Cross-subnet communication: All subnets can reach each other within the VPC
+
+#### Security
+***Security Groups:*** Allow HTTP ***(80)*** and HTTPS ***(443)*** inbound traffic
+
+Network ACLs: Default NACL allows all traffic

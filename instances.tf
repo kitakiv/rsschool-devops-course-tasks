@@ -7,7 +7,7 @@ resource "aws_instance" "ec2_public" {
   ami                         = var.ec2_settings.ami
   vpc_security_group_ids      = [aws_security_group.security_group.id]
   associate_public_ip_address = true
-  user_data              = <<-EOF
+  user_data                   = <<-EOF
       #!/bin/sh
       sudo apt-get update
       sudo apt install -y apache2
