@@ -15,10 +15,10 @@ resource "aws_network_acl" "acl_for_subnets" {
   dynamic "ingress" {
     for_each = local.ingress_rules
     content {
-      protocol   = "tcp"
+      protocol   = ingress.value.protocol
       rule_no    = ingress.value.rule_no
       action     = "allow"
-      cidr_block = "0.0.0.0/0"
+      cidr_block = ingress.value.cidr_block
       from_port  = ingress.value.port
       to_port    = ingress.value.port
     }

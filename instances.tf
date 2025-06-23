@@ -5,21 +5,18 @@ resource "aws_instance" "ec2_public" {
   subnet_id                   = aws_subnet.public_subnets[count.index].id
   instance_type               = var.ec2_settings.instance_type
   ami                         = var.ec2_settings.ami
+  key_name                    = var.ec2_settings.key_name
   vpc_security_group_ids      = [aws_security_group.security_group.id]
   associate_public_ip_address = true
-  user_data                   = <<-EOF
-      #!/bin/sh
-      sudo apt-get update
-      sudo apt install -y apache2
-      sudo systemctl status apache2
-      sudo systemctl start apache2
-      sudo chown -R $USER:$USER /var/www/html
-      sudo echo "<html><body><h1>Hello this is public ${count.index + 1}</h1></body></html>" > /var/www/html/index.html
-      EOF
 
   tags = {
     Name = "ec2_public_${count.index + 1}"
   }
+}
+
+resource "aws_key_pair" "deployer" {
+  key_name   = var.ec2_settings.key_name
+  public_key = var.ec2_settings.public_key
 }
 
 resource "aws_instance" "ec2_private" {
@@ -28,18 +25,15 @@ resource "aws_instance" "ec2_private" {
   subnet_id              = aws_subnet.private_subnets[count.index].id
   instance_type          = var.ec2_settings.instance_type
   ami                    = var.ec2_settings.ami
+  key_name               = var.private_subnet_key.key_name
   vpc_security_group_ids = [aws_security_group.security_group.id]
-  user_data              = <<-EOF
-      #!/bin/sh
-      sudo apt-get update
-      sudo apt install -y apache2
-      sudo systemctl status apache2
-      sudo systemctl start apache2
-      sudo chown -R $USER:$USER /var/www/html
-      sudo echo "<html><body><h1>Hello this is private ${count.index + 1}</h1></body></html>" > /var/www/html/index.html
-      EOF
 
   tags = {
     Name = "ec2_private_${count.index + 1}"
   }
+}
+
+resource "aws_key_pair" "deployer_private" {
+  key_name   = var.private_subnet_key.key_name
+  public_key = var.private_subnet_key.public_key
 }

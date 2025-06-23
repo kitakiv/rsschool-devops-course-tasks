@@ -8,11 +8,6 @@ resource "aws_route_table" "route_table" {
     gateway_id = aws_internet_gateway.gateway.id
   }
 
-  route {
-    gateway_id = "local"
-    cidr_block = "10.0.0.0/16"
-  }
-
   tags = {
     Name = "Route table EC2 access"
   }
@@ -29,28 +24,23 @@ resource "aws_route_table_association" "public_subnet_connect" {
 
 // Route table for private subnets
 
-resource "aws_route_table" "private_route_table" {
+resource "aws_route_table" "private_route_table_nat" {
   vpc_id = aws_vpc.ec2_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.nat_gw.id
-  }
-
-  route {
-    gateway_id = "local"
-    cidr_block = "10.0.0.0/16"
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = aws_instance.nat_instance.primary_network_interface_id
   }
 
   tags = {
     Name = "Private route table EC2 access"
   }
 
-  depends_on = [aws_eip.eip_for_nat_gw, aws_nat_gateway.nat_gw]
+  depends_on = [aws_instance.nat_instance]
 }
 
 resource "aws_route_table_association" "private_subnet_connect" {
   count          = length(var.private_subnet_cidrs)
   subnet_id      = element(aws_subnet.private_subnets[*].id, count.index)
-  route_table_id = aws_route_table.private_route_table.id
+  route_table_id = aws_route_table.private_route_table_nat.id
 }
