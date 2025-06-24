@@ -42,7 +42,7 @@ resource "aws_security_group" "private_instance_sg" {
     protocol        = "tcp"
     security_groups = []
     description     = "SSH access from bastion host"
-    cidr_blocks     = ["0.0.0.0/0"]
+    cidr_blocks     = ["176.36.14.128/32"]
   }
 
   egress {
