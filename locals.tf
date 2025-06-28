@@ -20,7 +20,7 @@ locals {
       rule_no     = 300
       description = "Ingress rules for port 22"
       tag         = "300 rule for port 22"
-      cidr_block  = "176.36.14.128/32",
+      cidr_block  = "0.0.0.0/0",
       protocol    = "tcp"
   }]
 }

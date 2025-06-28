@@ -28,8 +28,8 @@ resource "aws_route_table" "private_route_table_nat" {
   vpc_id = aws_vpc.ec2_vpc.id
 
   route {
-    cidr_block           = "0.0.0.0/0"
-    network_interface_id = aws_instance.nat_instance.primary_network_interface_id
+    cidr_block  = "0.0.0.0/0"
+    instance_id = aws_instance.nat_instance.id
   }
 
   tags = {

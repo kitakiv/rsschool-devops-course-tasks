@@ -21,12 +21,13 @@ resource "aws_key_pair" "deployer" {
 
 resource "aws_instance" "ec2_private" {
 
-  count                  = length(aws_subnet.private_subnets)
-  subnet_id              = aws_subnet.private_subnets[count.index].id
-  instance_type          = var.ec2_settings.instance_type
-  ami                    = var.ec2_settings.ami
-  key_name               = var.private_subnet_key.key_name
-  vpc_security_group_ids = [aws_security_group.security_group.id]
+  count                       = length(aws_subnet.private_subnets)
+  subnet_id                   = aws_subnet.private_subnets[count.index].id
+  instance_type               = var.ec2_settings.instance_type
+  ami                         = var.ec2_settings.ami
+  key_name                    = var.private_subnet_key.key_name
+  vpc_security_group_ids      = [aws_security_group.private_instance_sg.id]
+  associate_public_ip_address = false
 
   tags = {
     Name = "ec2_private_${count.index + 1}"
