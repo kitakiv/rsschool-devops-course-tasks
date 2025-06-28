@@ -42,7 +42,7 @@ resource "aws_security_group" "private_instance_sg" {
     protocol        = "-1"
     security_groups = []
     description     = "Allow all inbound traffic"
-    cidr_blocks     = [var.public_subnet_cidrs[0], var.public_subnet_cidrs[1], var.private_subnet_cidrs[0], var.private_subnet_cidrs[1]]
+    cidr_blocks     = ["0.0.0.0/0"]
   }
 
   egress {
