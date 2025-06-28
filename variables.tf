@@ -50,6 +50,7 @@ variable "ec2_settings" {
     }
     instance_profile = "ec2_instance_profile"
   }
+  sensitive = true
 }
 
 variable "private_subnet_key" {
@@ -62,6 +63,8 @@ variable "private_subnet_key" {
     key_name   = "demo_instance_private"
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDcKjk7ZdToat2jLwIFdcw20ZQJDnNMEbCJbq0/Jh9tLkiyWlKVRdsEOL+e/e2ItsNT+J6A5QbWZ1W7TWOFaIi7230wXNjjW6T3emGcW2qOUKQe0nRdi5FB0AifTyreW3oDMSzFq0KqIdcWyjcfBxWvVMh6PZpI/1V809NxC5XbTF1bUYGXcdqjxgCDYozgSr0M8Z3JC2PZs4muDJ8CCs3EWFS2P4LeQve59N0VhCeLV6shW1QIvZhP/XybntbjphVOnU13wgOpiasvdv+OrrYChrhBkfotPsl+DDNWufslwi/G+nl0u6bTI7uBYc4SdOayxZWb3gw2qfRDTTDKZwRp kitge@Master"
   }
+
+  sensitive = true
 }
 
 variable "nat_key" {
@@ -74,4 +77,6 @@ variable "nat_key" {
     key_name   = "demo_instance_nat"
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/1n9Nh0vRBdUec7yEIfD4j6EZS+7MT/7qoRsvKTtE6uxiXXypbYNdjFs6zTXv9ujNPyC15c+DnqPhJxltg2Jk8TGD2WjNIeI4sD6vYp5Eq9QoBgP36xbEI6HjYs3nU0DZFRyXRPdP5byRIN+Ktad37PTJDAf99ohGehcya6vHBj3RQY5e7kWSrUmBAVOsXmKH0oCCs6xnAv41INTePezfUFeuCMHPeRwyjMwRXFTXCWaoJ6Zfu4fA+HUqRV/mHc8+FVrBlrnzadgqBwxIznZwmTUms2TaozkGh7i/c+0AtQok9eY1LhxUTsurCm2e7BhmDv4q2cySjUl73A7832aL kitge@Master"
   }
+
+  sensitive = true
 }

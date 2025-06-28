@@ -37,12 +37,12 @@ resource "aws_security_group" "private_instance_sg" {
   vpc_id      = aws_vpc.ec2_vpc.id
 
   ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
     security_groups = []
-    description     = "SSH access from bastion host"
-    cidr_blocks     = ["176.36.14.128/32"]
+    description     = "Allow all inbound traffic"
+    cidr_blocks     = [var.public_subnet_cidrs[0], var.public_subnet_cidrs[1], var.private_subnet_cidrs[0], var.private_subnet_cidrs[1]]
   }
 
   egress {
