@@ -1,6 +1,6 @@
 resource "aws_network_acl" "public" {
 
-  vpc_id     = aws_vpc.ec2_vpc.id
+  vpc_id = aws_vpc.ec2_vpc.id
 
   subnet_ids = [aws_subnet.public_subnets[0].id, aws_subnet.public_subnets[1].id, aws_subnet.private_subnets[0].id, aws_subnet.private_subnets[1].id]
 
