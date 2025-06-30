@@ -29,7 +29,7 @@ resource "aws_instance" "ec2_private_master" {
   instance_type          = var.k3s_settings.instance_type
   ami                    = var.k3s_settings.ami
   key_name               = var.private_subnet_key.key_name
-  vpc_security_group_ids = [aws_security_group.security_group.id]
+  vpc_security_group_ids = [aws_security_group.private_instance_sg.id]
 
 
   user_data = <<-EOF
@@ -53,7 +53,7 @@ resource "aws_instance" "ec2_private_worker" {
   instance_type          = var.k3s_settings.instance_type
   ami                    = var.k3s_settings.ami
   key_name               = var.private_subnet_key.key_name
-  vpc_security_group_ids = [aws_security_group.security_group.id]
+  vpc_security_group_ids = [aws_security_group.private_instance_sg.id]
 
   tags = {
     Name = "k3s_worker"

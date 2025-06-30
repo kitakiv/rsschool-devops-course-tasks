@@ -1,3 +1,44 @@
+resource "aws_security_group" "nat_security_group" {
+  name        = "nat-instance-security-group"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.ec2_vpc.id
+
+
+  ingress {
+    description = "SSH from bastion"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "k3s API server"
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = var.private_subnet_cidrs
+  }
+
+  ingress {
+    description = "Allow ephemeral ports from private subnet"
+    from_port   = 1024
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = var.private_subnet_cidrs
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+}
+
+
 resource "aws_security_group" "security_group" {
   name        = "resource_with_dynamic_block"
   description = "Allow TLS inbound traffic"
@@ -41,7 +82,7 @@ resource "aws_security_group" "private_instance_sg" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.security_group.id]
+    security_groups = [aws_security_group.security_group.id, aws_security_group.nat_security_group.id]
   }
 
   ingress {
@@ -57,7 +98,7 @@ resource "aws_security_group" "private_instance_sg" {
     from_port       = 6443
     to_port         = 6443
     protocol        = "tcp"
-    security_groups = [aws_security_group.security_group.id]
+    security_groups = [aws_security_group.security_group.id, aws_security_group.nat_security_group.id]
   }
 
   ingress {

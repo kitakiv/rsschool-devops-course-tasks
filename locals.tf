@@ -22,5 +22,14 @@ locals {
       tag         = "300 rule for port 22"
       cidr_block  = "0.0.0.0/0",
       protocol    = "tcp"
-  }]
+  },
+  {
+      port        = 6443
+      rule_no     = 400
+      description = "Ingress rules for port 6443"
+      tag         = "400 rule for port 6443"
+      cidr_block  = "0.0.0.0/0",
+      protocol    = "tcp"
+  }
+  ]
 }
