@@ -1,4 +1,9 @@
 
+resource "random_password" "k3s_token" {
+  length  = 64
+  special = false
+}
+
 resource "aws_instance" "ec2_public" {
 
   count                       = length(aws_subnet.public_subnets)
@@ -19,17 +24,39 @@ resource "aws_key_pair" "deployer" {
   public_key = var.ec2_settings.public_key
 }
 
-resource "aws_instance" "ec2_private" {
+resource "aws_instance" "ec2_private_master" {
+  subnet_id              = aws_subnet.private_subnets[0].id
+  instance_type          = var.k3s_settings.instance_type
+  ami                    = var.k3s_settings.ami
+  key_name               = var.private_subnet_key.key_name
+  vpc_security_group_ids = [aws_security_group.security_group.id]
 
-  count                  = length(aws_subnet.private_subnets)
-  subnet_id              = aws_subnet.private_subnets[count.index].id
-  instance_type          = var.ec2_settings.instance_type
-  ami                    = var.ec2_settings.ami
+
+  user_data = <<-EOF
+  #!/bin/bash
+  set -euxo pipefail
+
+  apt-get update -y
+  apt-get install -y curl
+
+  curl  -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" K3S_TOKEN="${random_password.k3s_token.result}" sh -
+  EOF
+
+  tags = {
+    Name = "k3s_master"
+  }
+}
+
+resource "aws_instance" "ec2_private_worker" {
+
+  subnet_id              = aws_subnet.private_subnets[1].id
+  instance_type          = var.k3s_settings.instance_type
+  ami                    = var.k3s_settings.ami
   key_name               = var.private_subnet_key.key_name
   vpc_security_group_ids = [aws_security_group.security_group.id]
 
   tags = {
-    Name = "ec2_private_${count.index + 1}"
+    Name = "k3s_worker"
   }
 }
 

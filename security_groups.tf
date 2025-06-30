@@ -37,6 +37,72 @@ resource "aws_security_group" "private_instance_sg" {
   vpc_id      = aws_vpc.ec2_vpc.id
 
   ingress {
+    description     = "SSH from bastion"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.security_group.id]
+  }
+
+  ingress {
+    description = "k3s API server"
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    self        = true
+  }
+
+  ingress {
+    description     = "k3s API server from bastion"
+    from_port       = 6443
+    to_port         = 6443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.security_group.id]
+  }
+
+  ingress {
+    description = "Flannel VXLAN"
+    from_port   = 8472
+    to_port     = 8472
+    protocol    = "udp"
+    self        = true
+  }
+
+
+  ingress {
+    description = "k3s metrics server"
+    from_port   = 10250
+    to_port     = 10250
+    protocol    = "tcp"
+    self        = true
+  }
+
+  ingress {
+    description = "NodePort services"
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  ingress {
+    description = "port for k3s server"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "port for k3s server"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  ingress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"

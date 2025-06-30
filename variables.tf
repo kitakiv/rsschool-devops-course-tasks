@@ -80,3 +80,32 @@ variable "nat_key" {
 
   sensitive = true
 }
+
+variable "k3s_settings" {
+  type = object({
+    instance_type = string
+    ami           = string
+    key_name      = string
+  })
+  description = "k3s Settings"
+  default = {
+    instance_type = "t3.small"
+    ami           = "ami-01f23391a59163da9"
+    key_name      = "demo_instance_private"
+  }
+}
+
+# data "aws_ami" "ubuntu" {
+#   most_recent = true
+#   owners      = ["099720109477"] # Canonical (official Ubuntu images)
+
+#   filter {
+#     name   = "name"
+#     values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+#   }
+
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
