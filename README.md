@@ -42,13 +42,102 @@ Terraform >= v1.12.1
 ### Security
 - **Security Groups**:
   - Public instances: Allow HTTP (80), HTTPS (443), and SSH (22)
-  - Private instances: Allow SSH only from bastion host
-  - Bastion host: Allow SSH from anywhere
+  - Private instances: Allow SSH only from bastion host, ports to create k3s clusters
+  - Nat instance: Allow ports to create cluster and ssh port
 - **Network ACLs**: Default NACL configuration
 
 ## Bastion Host
 
 The bastion host provides secure SSH access to instances in private subnets.
+
+# K3s Kubernetes Cluster Setup
+
+This repository contains Terraform code and scripts to deploy a lightweight Kubernetes cluster using [K3s](https://k3s.io/) on AWS with a bastion (NAT) host.
+
+## Architecture
+
+- **Master node(s):** Runs the K3s control plane.
+- **Worker node(s):** Join the cluster using a shared token.
+- **Bastion host (NAT):** Provides secure SSH access to private nodes.
+- **Private VPC:** Cluster nodes run on private IPs, accessible via bastion.
+
+## Prerequisites
+
+- AWS account and credentials configured
+- Terraform installed
+- SSH private key for accessing instances
+- `kubectl` installed on your local machine
+
+## Setup Steps
+
+1. **Deploy infrastructure**
+
+   Run Terraform to create VPC, bastion, and EC2 instances:
+
+   in the variable file create three public and private key on your computer:
+   1. for nat instance
+   2. for public (Bastion) instances
+   3. for master and worker node instances
+
+   ```bash
+   terraform init
+   terraform apply
+
+## Connecting to the Bastion Host
+
+The Bastion Host (also called NAT instance) provides secure access to your private AWS resources, including the Kubernetes master and worker nodes.
+
+### Prerequisites
+
+- SSH private key file (`.pem`) corresponding to the key pair used when launching the Bastion Host.
+- Public IP address of the Bastion Host.
+
+### Steps to Connect
+
+1. **Open a terminal on your local machine.**
+
+2. **Run the SSH command:**
+
+```bash
+ssh -i /path/to/your/key.pem ubuntu@<BASTION_PUBLIC_IP>
+```
+### After connection to bastion host it can be public instances or nat:
+
+#### Create private file
+```bash
+touch private.pem
+```
+
+```bash
+vi private.pem
+```
+#### After that pass there your private key for (private instance you want to create) and press ```:wq``` and press Enter
+
+```bash
+chmod 400 "private.pem"
+```
+```bash
+ssh -i "private.pem" ubuntu@<Private IP>
+```
+
+## Managing the Cluster on the Master Node
+
+After connecting to the master node via the Bastion Host, you can verify and manage your Kubernetes cluster using the following commands:
+
+### 1. Verify Kubernetes nodes
+
+Check the status of all cluster nodes:
+
+```bash
+kubectl get nodes
+```
+View cluster information
+
+```bash
+kubectl cluster-info
+kubectl get all --all-namespaces
+```
+
 
 ## CI/CD Pipeline
 

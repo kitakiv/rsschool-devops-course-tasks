@@ -22,6 +22,6 @@ locals {
       tag         = "300 rule for port 22"
       cidr_block  = "0.0.0.0/0",
       protocol    = "tcp"
-  },
+    },
   ]
 }
