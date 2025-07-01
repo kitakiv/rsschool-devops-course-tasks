@@ -39,7 +39,11 @@ resource "aws_instance" "ec2_private_master" {
   apt-get update -y
   apt-get install -y curl
 
-  curl  -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" K3S_TOKEN="${random_password.k3s_token.result}" sh -
+  curl  -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644" K3S_TOKEN="${random_password.k3s_token.result}" sh -
+  sleep 60
+  kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml
+
+
   EOF
 
   tags = {
@@ -54,6 +58,17 @@ resource "aws_instance" "ec2_private_worker" {
   ami                    = var.k3s_settings.ami
   key_name               = var.private_subnet_key.key_name
   vpc_security_group_ids = [aws_security_group.private_instance_sg.id]
+
+  user_data = <<-EOF
+  #!/bin/bash
+  set -euxo pipefail
+
+  apt-get update -y
+  apt-get install -y curl
+  sleep 60
+  curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent" K3S_URL="https://${aws_instance.ec2_private_master.private_ip}:6443" K3S_TOKEN="${random_password.k3s_token.result}" sh -
+  EOF
+
 
   tags = {
     Name = "k3s_worker"
