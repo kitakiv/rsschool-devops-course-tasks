@@ -32,19 +32,9 @@ resource "aws_instance" "ec2_private_master" {
   vpc_security_group_ids = [aws_security_group.private_instance_sg.id]
 
 
-  user_data = <<-EOF
-  #!/bin/bash
-  set -euxo pipefail
-
-  apt-get update -y
-  apt-get install -y curl
-
-  curl  -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode 644" K3S_TOKEN="${random_password.k3s_token.result}" sh -
-  sleep 60
-  kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml
-
-
-  EOF
+  user_data = base64encode(templatefile("${path.module}/k3s-master-user-data.sh", {
+    k3s_token = random_password.k3s_token.result
+  }))
 
   tags = {
     Name = "k3s_master"
@@ -59,15 +49,10 @@ resource "aws_instance" "ec2_private_worker" {
   key_name               = var.private_subnet_key.key_name
   vpc_security_group_ids = [aws_security_group.private_instance_sg.id]
 
-  user_data = <<-EOF
-  #!/bin/bash
-  set -euxo pipefail
-
-  apt-get update -y
-  apt-get install -y curl
-  sleep 60
-  curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent" K3S_URL="https://${aws_instance.ec2_private_master.private_ip}:6443" K3S_TOKEN="${random_password.k3s_token.result}" sh -
-  EOF
+  user_data = base64encode(templatefile("${path.module}/k3s-worker-user-data.sh", {
+    k3s_token     = random_password.k3s_token.result
+    k3s_master_ip = aws_instance.ec2_private_master.private_ip
+  }))
 
 
   tags = {
