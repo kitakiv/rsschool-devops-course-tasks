@@ -1,3 +1,44 @@
+resource "aws_security_group" "nat_security_group" {
+  name        = "nat-instance-security-group"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.ec2_vpc.id
+
+
+  ingress {
+    description = "SSH from bastion"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "k3s API server"
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = var.private_subnet_cidrs
+  }
+
+  ingress {
+    description = "Allow ephemeral ports from private subnet"
+    from_port   = 1024
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = var.private_subnet_cidrs
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+}
+
+
 resource "aws_security_group" "security_group" {
   name        = "resource_with_dynamic_block"
   description = "Allow TLS inbound traffic"
@@ -37,12 +78,78 @@ resource "aws_security_group" "private_instance_sg" {
   vpc_id      = aws_vpc.ec2_vpc.id
 
   ingress {
+    description     = "SSH from bastion"
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
+    security_groups = [aws_security_group.security_group.id, aws_security_group.nat_security_group.id]
+  }
+
+  ingress {
+    description = "k3s API server"
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    self        = true
+  }
+
+  ingress {
+    description     = "k3s API server from bastion"
+    from_port       = 6443
+    to_port         = 6443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.security_group.id, aws_security_group.nat_security_group.id]
+  }
+
+  ingress {
+    description = "Flannel VXLAN"
+    from_port   = 8472
+    to_port     = 8472
+    protocol    = "udp"
+    self        = true
+  }
+
+
+  ingress {
+    description = "k3s metrics server"
+    from_port   = 10250
+    to_port     = 10250
+    protocol    = "tcp"
+    self        = true
+  }
+
+  ingress {
+    description = "NodePort services"
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  ingress {
+    description = "port for k3s server"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "port for k3s server"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
     security_groups = []
-    description     = "SSH access from bastion host"
-    cidr_blocks     = ["176.36.14.128/32"]
+    description     = "Allow all inbound traffic"
+    cidr_blocks     = ["0.0.0.0/0"]
   }
 
   egress {
