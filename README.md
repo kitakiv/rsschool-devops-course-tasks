@@ -10,6 +10,178 @@ The infrastructure consists of a VPC with public and private subnets across two 
 Terraform >= v1.12.1
 ```
 
+## How to Create an NGINX App with Helm
+
+This guide shows how to deploy a simple NGINX web server in your Kubernetes cluster using **Helm** and the official **Bitnami NGINX Helm chart**.
+
+### Prerequisites
+
+- Helm installed and configured
+- A running Kubernetes cluster (e.g., Minikube)
+
+###  Steps
+
+#### 1. Add the Bitnami Helm repository
+
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+#### 2. Install the NGINX Helm chart
+
+```bash
+helm install my-nginx bitnami/nginx
+```
+#### 3. Verify the deployment
+
+```bash
+kubectl get all
+```
+![kubectl get all output](./images/image1.png)
+
+#### 4. Access the NGINX app locally
+
+```bash
+kubectl port-forward svc/my-nginx 8080:80
+```
+#### 5. Then open your browser and go to:
+
+```bash
+http://localhost:8080
+```
+![The deploy of nginx](./images/image.png)
+
+#### To uninstall use this command:
+
+```bash
+helm uninstall my-nginx
+```
+
+##  Deploy Jenkins with Persistent Storage in Kubernetes Using Helm
+
+This guide explains how to deploy Jenkins on a Kubernetes cluster using Helm, while ensuring configuration and job data are stored persistently using a Persistent Volume (PV) and Persistent Volume Claim (PVC).
+
+### 📁 Files Used
+
+#### `jenkins-pv.yaml`
+
+Defines a static Persistent Volume on the local node:
+
+Open the file and follow the instructions
+
+#### `jenkins-pvc.yaml`
+
+Defines a Persistent Volume Claim that Jenkins will use:
+
+Open the file and follow the instructions
+
+### `jenkins-values.yaml`
+
+Custom Helm values for installing Jenkins with persistent storage and NodePort access:
+
+```yaml
+controller:
+  adminUser: admin
+  adminPassword: admin123 # write your password
+  serviceType: NodePort # check
+  persistence:
+    enabled: true
+    existingClaim: local-storage-pvc # write your pvc name
+  nodeSelector:
+    kubernetes.io/hostname: minikube  # Replace with your node name
+```
+## Deployment Steps
+### 1. Create Namespace
+```bash
+kubectl create namespace jenkins-helm
+```
+## 2. Apply Persistent Volume and Claim
+
+```bash
+kubectl apply -f pv-storage.yml
+kubectl apply -f pvc-storage.yml
+```
+### 3. Add Jenkins Helm Repo
+```bash
+helm repo add jenkinsci https://charts.jenkins.io
+helm repo update
+```
+### 4. Install Jenkins with Custom Values
+```bash
+helm install jenkins jenkinsci/jenkins -n jenkins-helm -f jenkins-values.yaml
+```
+## Verify the Deployment
+
+```bash
+kubectl get pods -n jenkins-helm
+kubectl get svc -n jenkins-helm
+kubectl get pvc -n jenkins-helm
+```
+
+![get pods](./images/image2.png)
+![get svc](./images/image3.png)
+![get pvc](./images/image4.png)
+
+
+
+### Access Jenkins
+Get the Node IP:
+
+```bash
+minikube ip
+```
+Get the NodePort: (default 32000)
+
+```bash
+kubectl get svc -n jenkins-helm
+```
+Open Jenkins in your browser:
+
+```bash
+http://<NODE_IP>:<NODE_PORT>
+```
+### decode from the Kubernetes secret (if createSecret: true was used):
+
+```bash
+kubectl get secret jenkins -n jenkins-helm -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode
+kubectl get secret jenkins -n jenkins-helm -o jsonpath="{.data.jenkins-admin-user}" | base64 --decode
+```
+
+### login and create your first freestyle job:
+
+1. In the Jenkins dashboard, click **“New Item”** from the left menu.
+
+2. **Enter a job name**, e.g., `hello-world-job`.
+
+3. Select **Freestyle project**, then click **OK**.
+
+4. On the job configuration screen:
+- Scroll to the **Build** section.
+- Click **Add build step → Execute shell**.
+
+5. In the command field, enter:
+
+```bash
+echo "Hello world" >> hello.txt
+cat hello.txt
+```
+### if you terminate the pod and then start it again all jobs will be saved!!!
+
+6. Click Save at the bottom.
+
+7. On the project page, click “Build Now”.
+
+8. Click the build number in the Build History (e.g. #1), then click “Console Output” to verify the
+
+## Clean up
+```bash
+helm uninstall jenkins -n jenkins-helm
+kubectl delete pvc local-storage-pvc -n jenkins-helm
+kubectl delete pv local-storage-pv
+kubectl delete namespace jenkins-helm
+```
+
+
 ## Architecture
 
 ![Architecture Diagram](https://via.placeholder.com/800x400?text=AWS+Infrastructure+Diagram)
@@ -175,20 +347,3 @@ GitHub Actions uses OIDC (OpenID Connect) to authenticate with AWS.
 4. Create pull requests for changes
 5. Merge to main branch to trigger deployment
 
-## File Structure
-
-```
-.
-├── .github/workflows/    # GitHub Actions workflow
-├── acl_vpc.tf           # Network ACL configuration
-├── gateways.tf          # Internet gateway configuration
-├── instances.tf         # EC2 instances configuration
-├── locals.tf            # Local variables
-├── main.tf              # VPC configuration
-├── nat-instance.tf      # NAT instance configuration
-├── provider.tf          # AWS provider and backend configuration
-├── route_table.tf       # Route tables configuration
-├── security_groups.tf   # Security groups configuration
-├── subnets.tf           # Subnets configuration
-└── variables.tf         # Input variables
-```
