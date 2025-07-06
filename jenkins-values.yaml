@@ -412,6 +412,7 @@ controller:
     - workflow-aggregator:608.v67378e9d3db_1
     - git:5.7.0
     - configuration-as-code:1971.vf9280461ea_89
+    - job-dsl:latest
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
@@ -543,12 +544,30 @@ controller:
           name: "Jenkins Admin"
           password: "${chart-admin-password}"
 
+    configScripts:
+      hello-world-jcasc: |-
+         jobs:
+          - script: >
+              job('hello-world') {
+                description('This job was created using Job DSL and JCasC.')
+                steps {
+                  shell('echo Hello World, Jcasc!')
+                }
+              }
+
     # Ignored if authorizationStrategy is defined in controller.JCasC.configScripts
     # -- Jenkins Config as Code Authorization Strategy-section
     authorizationStrategy: |-
       loggedInUsersCanDoAnything:
         allowAnonymousRead: false
 
+    remotingSecurity: |-
+      enabled: true
+
+    # -- Annotations for the JCasC ConfigMap
+    unclassified:
+      rememberMe:
+        enabled: false
     # -- Annotations for the JCasC ConfigMap
     configMapAnnotations: {}
 
