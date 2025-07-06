@@ -181,6 +181,46 @@ kubectl delete pv local-storage-pv
 kubectl delete namespace jenkins-helm
 ```
 
+## Jenkins Security Configuration (via JCasC)
+
+Jenkins is secured using Jenkins Configuration as Code (JCasC) and deployed with Helm. The following security settings are configured automatically:
+
+- **Authentication** is enabled using Jenkins' own user database.
+- An admin user is created with the following credentials:
+  - **Username**: `admin`
+  - **Password**: `auto generated`
+- **Authorization strategy**: "Full control once logged in"
+- **Anonymous access** is disabled
+
+These settings are defined in the Helm chart’s `jenkins-values.yaml` using the `controller.JCasC.configScripts.security-config` section.
+
+---
+
+## "Hello World" Job Created via JCasC + Job DSL
+
+A freestyle job named `hello-world` is created automatically when Jenkins starts.
+### Job Definition
+
+The job is configured to execute a simple shell command:
+
+```bash
+echo Hello World
+```
+#### File `jenkins-values.yaml`
+```yaml
+enabled: true
+    configScripts:
+      hello-job: |
+        jobs:
+          - script: >
+              job('hello-world') {
+                description('This job was created using Job DSL and JCasC.')
+                steps {
+                  shell('echo Hello World')
+                }
+              }
+```
+
 
 ## Architecture
 
