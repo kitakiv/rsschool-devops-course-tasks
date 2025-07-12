@@ -9,6 +9,85 @@ The infrastructure consists of a VPC with public and private subnets across two 
 ```
 Terraform >= v1.12.1
 ```
+## Deploy python simple server with Helm
+
+This guide shows how to deploy a simple Python web server in your Kubernetes cluster using **Helm**
+
+```
+Docker >=28.0.4
+Kubectl >=v1.32.2
+Helm >=v3.18.3
+Minikube >=v1.36.0
+```
+1. Minikube should be running:
+
+run it:
+```bash
+minikube start
+```
+To check minikube is running:
+```bash
+kubectl get node
+```
+Go to helmProject folder and run this commands:
+
+2. Login to the docker:
+```bash
+docker login
+```
+Check the server by running the python file ```./helmProject/main.py```
+
+Build the image:
+```bash
+docker build -t <the image name> .
+```
+Check the image: and go to http://localhost:80
+```bash
+docker run -p 80:8080
+```
+3. Push your image to docker hub by running this commands:
+```bash
+docker tag <image name> <your docker hub>/<image name>
+```
+
+```bash
+docker push <your docker hub>/<image name>
+```
+### Creating deploy
+
+4. Change the image name in ```.helmProject/flask-project/values.yaml```
+
+```yaml
+image:
+  repository: <your docker hub>/<image name>
+```
+
+5. Run the command to create a chart:
+!!! Check in which folder you are, should be in helmProject
+```bash
+helm install <name of chart that you want> flask-project
+```
+Check the <name of chart that you want> should be deployed
+```bash
+kubectl get pod
+```
+7.
+```bash
+kubectl get svc
+```
+![kubectl get svc output](./images/svc.png)
+Take the port in my case is **32428**
+
+8. Run this command to get the minikube address:
+
+```bash
+minikube ip
+```
+![minikube ip](./images/ip.png)
+
+9. Go to the http://<minikube ip>:<port of the server in my case **32428**>
+
+![the server in web broser](images/hello.png)
 
 ## How to Create an NGINX App with Helm
 
