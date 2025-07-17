@@ -3,6 +3,11 @@ pipeline {
         label 'jenkins-jenkins-agent'
     }
     stages {
+        stage('Clean workspace') {
+            steps {
+                cleanWs()
+            }
+        }
         stage('Checkout from SCM'){
             steps {
                 git branch: 'task-6', url: 'https://github.com/kitakiv/rsschool-devops-course-tasks/'
