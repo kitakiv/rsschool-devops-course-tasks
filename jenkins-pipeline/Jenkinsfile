@@ -13,6 +13,11 @@ pipeline {
                 git branch: 'task-6', url: 'https://github.com/kitakiv/rsschool-devops-course-tasks/'
             }
         }
+        stage('Build') {
+            steps {
+                sh 'pip3 install -r app/requirements.txt'
+            }
+        }
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
