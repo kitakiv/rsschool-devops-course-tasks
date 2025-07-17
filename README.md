@@ -171,6 +171,17 @@ controller:
 ```
 ## Deployment Steps
 ### 1. Create Namespace
+Ensure that you have a path in minikube **/home/storage** for storage cache, if you haven't run this commands:
+
+```bash
+minikube ssh
+```
+```bash
+sudo mkdir -p /home/storage
+sudo chmod 777 /home/storage
+```
+**chmod 777** allow jenkins to change the file
+
 ```bash
 kubectl create namespace jenkins-helm
 ```

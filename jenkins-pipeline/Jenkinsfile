@@ -3,14 +3,19 @@ pipeline {
         label 'jenkins-jenkins-agent'
     }
     stages {
-        stage('Build') {
+        stage('Clean up workspace') {
             steps {
-                echo 'Building..'
+                cleanWs()
             }
         }
-        stage('Test'){
+        stage('Checkout from SCM'){
             steps {
-                echo 'Testing...'
+                git branch: 'task-6', url: 'https://github.com/kitakiv/rsschool-devops-course-tasks/'
+            }
+        }
+        stage('Install dependencies') {
+            steps {
+                sh 'pip install -r ./app/requirements.txt'
             }
         }
         stage('Deploy') {
