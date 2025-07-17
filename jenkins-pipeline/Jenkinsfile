@@ -10,7 +10,7 @@ pipeline {
         }
         stage('Install dependencies') {
             steps {
-                sh 'pip install -r ./app/requirements.txt'
+                sh 'pip install -r ./jenkins-pipeline/app/requirements.txt'
             }
         }
         stage('Deploy') {
