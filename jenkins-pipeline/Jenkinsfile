@@ -1,6 +1,8 @@
 pipeline {
     agent {
-        label 'jenkins-jenkins-agent'
+        docker {
+            image 'python:3.11'
+        }
     }
     stages {
         stage('Checkout from SCM'){
