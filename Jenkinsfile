@@ -19,6 +19,22 @@ pipeline {
           '''
         }
       }
+
+    }
+    stage('Test') {
+      agent{
+        kubernetes {
+          yamlFile './jenkins-pods/python-pod.yaml'
+        }
+      }
+      steps {
+        container('python'){
+          sh '''
+            cd python_app
+            pytest test.py
+          '''
+        }
+      }
     }
   }
 }
