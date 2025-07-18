@@ -7,7 +7,7 @@ kind: Pod
 spec:
   containers:
     - name: python
-      image: python:3.11-slim
+      image: python:3
       command:
         - cat
       tty: true
@@ -28,7 +28,7 @@ spec:
         }
         stage('Build') {
             steps {
-                sh 'pip3 install -r app/requirements.txt'
+                sh 'pip install -r ./python_app/requirements.txt'
             }
         }
         stage('Deploy') {
