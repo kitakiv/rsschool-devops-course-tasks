@@ -1,0 +1,40 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+    - name: python
+      image: python:3.11-slim
+      command:
+        - cat
+      tty: true
+      workingDir: /home/jenkins/agent
+"""
+        }
+    }
+    stages {
+        stage('Clean workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout from SCM'){
+            steps {
+                git branch: 'task-6', url: 'https://github.com/kitakiv/rsschool-devops-course-tasks/'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'pip3 install -r app/requirements.txt'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+            }
+        }
+    }
+}
