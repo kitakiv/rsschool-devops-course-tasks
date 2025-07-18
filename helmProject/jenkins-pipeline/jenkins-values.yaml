@@ -413,6 +413,14 @@ controller:
     - git:5.7.0
     - configuration-as-code:1971.vf9280461ea_89
     - job-dsl:latest
+    - workflow-job
+    - workflow-aggregator
+    - credentials-binding
+    - blueocean
+    - pipeline-stage-view
+    - durable-task
+    - docker-workflow
+    - ssh-slaves
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
@@ -1226,25 +1234,25 @@ agent:
 
 # Inherits all values from `agent` so you only need to specify values which differ
 # -- Configure additional
-additionalAgents:
- maven:
-   podName: maven
-   customJenkinsLabels: maven
-   # An example of overriding the jnlp container
-   # sideContainerName: jnlp
-   image:
-     repository: jenkins/jnlp-agent-maven
-     tag: latest
- python:
-   podName: python
-   customJenkinsLabels: python
-   sideContainerName: python
-   image:
-     repository: python
-     tag: "3"
-   command: "/bin/sh -c"
-   args: "cat"
-   TTYEnabled: true
+additionalAgents: {}
+#  maven:
+#    podName: maven
+#    customJenkinsLabels: maven
+#    # An example of overriding the jnlp container
+#    # sideContainerName: jnlp
+#    image:
+#      repository: jenkins/jnlp-agent-maven
+#      tag: latest
+#  python:
+#    podName: python
+#    customJenkinsLabels: python
+#    sideContainerName: python
+#    image:
+#      repository: python
+#      tag: "3"
+#    command: "/bin/sh -c"
+#    args: "cat"
+#    TTYEnabled: true
 
 # Here you can add additional clouds
 # They inherit all values from the default cloud (including the main agent), so
