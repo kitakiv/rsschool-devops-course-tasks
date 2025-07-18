@@ -30,7 +30,10 @@ pipeline {
       steps {
         container('python'){
           sh '''
+            python --version
+            pip --version
             cd python_app
+            pip install -r requirements.txt
             pytest test.py
           '''
         }
