@@ -28,7 +28,7 @@ spec:
         }
         stage('Build') {
             steps {
-                sh 'pip install -r ./python_app/requirements.txt'
+                sh 'pip --version'
             }
         }
         stage('Deploy') {
