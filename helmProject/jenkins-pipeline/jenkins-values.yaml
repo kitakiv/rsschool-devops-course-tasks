@@ -421,6 +421,7 @@ controller:
     - durable-task
     - docker-workflow
     - ssh-slaves
+    - sonar:2.18
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
