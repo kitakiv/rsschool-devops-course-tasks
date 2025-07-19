@@ -39,5 +39,19 @@ pipeline {
         }
       }
     }
+    stage('SonarQube Analysis') {
+      agent{
+        kubernetes {
+          yamlFile './jenkins-pods/sonarqube-pod.yaml'
+        }
+      }
+      steps {
+        container('sonar-scanner') {
+          withSonarQubeEnv('sonar_qube') {
+            sh 'sonar-scanner'
+          }
+        }
+      }
+    }
   }
 }
