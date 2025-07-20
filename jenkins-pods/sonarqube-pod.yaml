@@ -10,3 +10,9 @@ spec:
       command:
         - cat
       tty: true
+      volumeMounts:
+        - name: sonarqube-volume
+          mountPath: /home/jenkins/agent
+  volumes:
+    - name: sonarqube-volume
+      emptyDir: {}
