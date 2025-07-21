@@ -74,7 +74,7 @@ pipeline {
                 cd python_app
                 /kaniko/executor \
                   --context `pwd` \
-                  --dockerfile `pwd`/Dockerfile \
+                  --dockerfile `pwd`/dockerfile \
                   --destination ${imageName} \
                   --oci-layout-path /kaniko/output \
                   --insecure-pull \
