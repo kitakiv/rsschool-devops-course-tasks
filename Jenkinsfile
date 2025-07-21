@@ -1,5 +1,11 @@
 pipeline {
   agent none
+  environment {
+        DOCKER_REGISTRY = "docker.io"
+        RELEASE = "1.0.${BUILD_NUMBER}"
+        APP_NAME = "python-app"
+        IMAGE = "${DOCKER_USERNAME}/${APP_NAME}"
+      }
   stages {
     stage('Build') {
       agent{
@@ -59,30 +65,42 @@ pipeline {
           yamlFile './jenkins-pods/kaniko-pod.yaml'
         }
       }
-      environment {
-        DOCKER_REGISTRY = "docker.io"
-        RELEASE = "1.0"
-        APP_NAME = "python-app"
-      }
       steps {
         container('kaniko') {
           withCredentials([usernamePassword(credentialsId: 'docker-registry-token', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
             script {
-              def imageName = "${DOCKER_USERNAME}/${APP_NAME}:${RELEASE}.${BUILD_NUMBER}"
-
               sh """
                 cd python_app
                 /kaniko/executor \
                   --context `pwd` \
                   --dockerfile `pwd`/dockerfile \
-                  --destination ${imageName} \
+                  --destination ${IMAGE}:${RELEASE} \
                   --oci-layout-path /kaniko/output \
                   --insecure-pull \
                   --skip-tls-verify \
-                  --destination ${DOCKER_REGISTRY}/${imageName} \
+                  --destination ${DOCKER_REGISTRY}/${IMAGE}:${RELEASE} \
               """
             }
           }
+        }
+      }
+    }
+    stage('Deploy to Kubernetes') {
+      agent{
+        kubernetes {
+          yamlFile './jenkins-pods/helm-pod.yaml'
+        }
+      }
+      steps {
+        container('kubectl') {
+          sh '''
+            cd helmProject
+            helm upgrade --install python-app ./flask-project \
+            --namespace flask-helm \
+            --create-namespace \
+            --set image.repository=${DOCKER_REGISTRY}/${IMAGE} \
+            --set image.tag=${RELEASE}
+          '''
         }
       }
     }
