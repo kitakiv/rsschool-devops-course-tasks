@@ -72,7 +72,6 @@ pipeline {
 
               sh """
                 cd python_app
-                sh "ls -la /kaniko && /kaniko/executor --version"
                 /kaniko/executor \
                   --context `pwd` \
                   --dockerfile `pwd`/Dockerfile \
