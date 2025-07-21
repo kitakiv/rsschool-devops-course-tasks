@@ -80,7 +80,6 @@ pipeline {
                   --insecure-pull \
                   --skip-tls-verify \
                   --destination ${DOCKER_REGISTRY}/${imageName} \
-                  --docker-config=/kaniko/.docker/
               """
             }
           }
