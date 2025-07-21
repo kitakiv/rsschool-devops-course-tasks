@@ -1,10 +1,5 @@
 pipeline {
   agent none
-  environment {
-        DOCKER_REGISTRY = "docker.io"
-        RELEASE = "1.0.${BUILD_NUMBER}"
-        APP_NAME = "python-app"
-      }
   stages {
     stage('Build') {
       agent{
@@ -63,6 +58,11 @@ pipeline {
         kubernetes {
           yamlFile './jenkins-pods/kaniko-pod.yaml'
         }
+      }
+      environment {
+        DOCKER_REGISTRY = "docker.io"
+        RELEASE = "1.0.${BUILD_NUMBER}"
+        APP_NAME = "python-app"
       }
       steps {
         container('kaniko') {
