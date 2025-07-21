@@ -4,7 +4,6 @@ pipeline {
         DOCKER_REGISTRY = "docker.io"
         RELEASE = "1.0.${BUILD_NUMBER}"
         APP_NAME = "python-app"
-        IMAGE = "${DOCKER_USERNAME}/${APP_NAME}"
       }
   stages {
     stage('Build') {
@@ -69,17 +68,19 @@ pipeline {
         container('kaniko') {
           withCredentials([usernamePassword(credentialsId: 'docker-registry-token', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
             script {
+              def IMAGE = "${DOCKER_USERNAME}/${IMAGE}:${RELEASE}"
               sh """
                 cd python_app
                 /kaniko/executor \
                   --context `pwd` \
                   --dockerfile `pwd`/dockerfile \
-                  --destination ${IMAGE}:${RELEASE} \
+                  --destination ${IMAGE} \
                   --oci-layout-path /kaniko/output \
                   --insecure-pull \
                   --skip-tls-verify \
-                  --destination ${DOCKER_REGISTRY}/${IMAGE}:${RELEASE} \
+                  --destination ${DOCKER_REGISTRY}/${IMAGE} \
               """
+              environment.put('DOCKER_USERNAME', DOCKER_USERNAME)
             }
           }
         }
@@ -93,14 +94,16 @@ pipeline {
       }
       steps {
         container('kubectl') {
-          sh '''
+          withCredentials([usernamePassword(credentialsId: 'docker-registry-token', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+            sh '''
             cd helmProject
             helm upgrade --install python-app ./flask-project \
             --namespace flask-helm \
             --create-namespace \
-            --set image.repository=${DOCKER_REGISTRY}/${IMAGE} \
+            --set image.repository=${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${APP_NAME} \
             --set image.tag=${RELEASE}
           '''
+          }
         }
       }
     }
