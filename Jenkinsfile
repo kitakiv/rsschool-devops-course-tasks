@@ -8,6 +8,7 @@ pipeline {
         NAMESPACE = "flask-helm"
         HELM_FOLDER = "flask-project"
         MINIKUBE_IP = "172.25.145.95"
+        NODE_PORT = "30000"
       }
   stages {
     stage('Build') {
@@ -108,14 +109,6 @@ pipeline {
             --create-namespace \
             --set image.repository=${IMAGE}
             '''
-
-            script {
-              def nodePort = sh(
-                  script: "kubectl get svc ${APP_NAME}-${HELM_FOLDER} -n ${NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'",
-                  returnStdout: true
-              ).trim()
-              env.URL = "http://${MINIKUBE_IP}:${nodePort}"
-            }
           }
         }
       }
@@ -123,11 +116,14 @@ pipeline {
     stage("Smoke tests") {
       agent any
       steps {
-        sh """
-        echo "Running smoke test on: ${URL}"
-        sleep 10
-        curl --fail --retry 5 --retry-delay 5 ${URL}
-        """
+        script {
+          def URL = "http://${MINIKUBE_IP}:${NODE_PORT}"
+           sh """
+           echo "Running smoke test on: ${URL}"
+           sleep 10
+           curl --fail --retry 5 --retry-delay 5 ${URL}
+           """
+        }
       }
     }
   }
