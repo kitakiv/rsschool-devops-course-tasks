@@ -7,6 +7,7 @@ pipeline {
         PATH_TO_HELM_PROJECT = "./helmProject/flask-project"
         NAMESPACE = "flask-helm"
         HELM_FOLDER = "flask-project"
+        MINIKUBE_IP = "172.25.145.95"
       }
   stages {
     stage('Build') {
@@ -109,12 +110,11 @@ pipeline {
             '''
 
             script {
-              def minikubeIp = sh(script: "minikube ip", returnStdout: true).trim()
               def nodePort = sh(
                   script: "kubectl get svc ${APP_NAME}-${HELM_FOLDER} -n ${NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'",
                   returnStdout: true
               ).trim()
-              env.URL = "http://${minikubeIp}:${nodePort}"
+              env.URL = "http://${MINIKUBE_IP}:${nodePort}"
             }
           }
         }
