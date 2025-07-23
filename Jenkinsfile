@@ -125,9 +125,7 @@ pipeline {
       steps {
         script {
            sh """
-           echo "Running smoke test on: ${URL}"
-           sleep 10
-           curl --fail --retry 3 --retry-delay 3 ${URL}
+             curl -f ${URL}
            """
         }
       }
