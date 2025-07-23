@@ -1,5 +1,5 @@
 pipeline {
-  agent none
+  agent any
   environment {
         REGISTRY = "docker.io"
         RELEASE = "1.0.${BUILD_NUMBER}"
