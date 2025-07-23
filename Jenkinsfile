@@ -108,12 +108,14 @@ pipeline {
             --set image.repository=${IMAGE}
             '''
 
-            def minikubeIp = sh(script: "minikube ip", returnStdout: true).trim()
-            def nodePort = sh(
-                script: "kubectl get svc ${APP_NAME}-${HELM_FOLDER} -n ${NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'",
-                returnStdout: true
-            ).trim()
-            env.URL = "http://${minikubeIp}:${nodePort}"
+            script {
+              def minikubeIp = sh(script: "minikube ip", returnStdout: true).trim()
+              def nodePort = sh(
+                  script: "kubectl get svc ${APP_NAME}-${HELM_FOLDER} -n ${NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'",
+                  returnStdout: true
+              ).trim()
+              env.URL = "http://${minikubeIp}:${nodePort}"
+            }
           }
         }
       }
