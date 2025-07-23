@@ -9,10 +9,8 @@ spec:
       - cat
     tty: true
     volumeMounts:
-      - name: kubeconfig-volume
+      - name: my-kubeconfig
         mountPath: /root/.kube
         readOnly: false
   volumes:
-    - name: kubeconfig-volume
-      secret:
-        secretName: kubeconfig-secret
+    - name: my-kubeconfig
