@@ -44,6 +44,10 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+              {{- if .Values.service.nodePort }}
+              nodePort: {{ .Values.service.nodePort }}
+              {{- end }}
+
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
