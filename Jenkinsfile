@@ -100,7 +100,13 @@ pipeline {
               mkdir -p ~/.kube
               rm -f ~/.kube/config
               cp "$KUBECONFIG_FILE" ~/.kube/config
-              helm --help
+              ls
+              cd helmProject
+              helm upgrade --install python-app ./flask-project \
+            --namespace flask-helm \
+            --create-namespace \
+            --set image.repository=${IMAGE} \
+            --set image.tag=${RELEASE}
             '''
           }
         }
