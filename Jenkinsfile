@@ -98,8 +98,9 @@ pipeline {
            withCredentials([file(credentialsId: 'kubeconfig-dev', variable: 'KUBECONFIG_FILE')]) {
             sh '''
               mkdir -p ~/.kube
-              cp -f "$KUBECONFIG_FILE" ~/.kube/config
-              kubectl get pods
+              rm -f ~/.kube/config
+              cp "$KUBECONFIG_FILE" ~/.kube/config
+              kubectl get pods -n jenkins-helm
             '''
           }
         }
