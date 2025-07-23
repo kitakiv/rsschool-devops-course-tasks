@@ -95,14 +95,13 @@ pipeline {
       }
       steps {
         container('kubectl') {
+           withCredentials([file(credentialsId: 'kubeconfig-dev', variable: 'KUBECONFIG_FILE')]) {
             sh '''
-            cd helmProject
-            helm upgrade --install python-app ./flask-project \
-            --namespace flask-helm \
-            --create-namespace \
-            --set image.repository=${IMAGE} \
-            --set image.tag=${RELEASE}
-          '''
+              mkdir -p ~/.kube
+              cp "$KUBECONFIG_FILE" ~/.kube/config
+              kubectl get pods
+            '''
+          }
         }
       }
     }
