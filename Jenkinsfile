@@ -116,6 +116,7 @@ pipeline {
               def NODE_PORT = sh(script: "kubectl get --namespace ${NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}' services ${APP_NAME}-${HELM_FOLDER}", returnStdout: true).trim()
               def NODE_IP = sh(script: "kubectl get nodes --namespace ${NAMESPACE} -o jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
               env.URL = "http://${NODE_IP}:${NODE_PORT}"
+              env.NODE_IP = NODE_IP
             }
           }
         }
@@ -138,7 +139,7 @@ pipeline {
     success {
       sh '''
       curl -X POST -H 'Content-type: application/json' --data "{
-      \\"text\\": \\"🎉 *SUCCESS!* 🎉\\n✅ *Job:* '${JOB_NAME}' #${BUILD_NUMBER}\\n🔗 <${BUILD_URL}|Click here to view the build>\\" 
+      \\"text\\": \\"🎉 *SUCCESS!* 🎉\\n✅ *Job:* '${JOB_NAME}' #${BUILD_NUMBER}\\n🔗 <${URL}|Click here to view the build>\\n JenkinsPipeline <http://${NODE_IP}:${32000}/job/jenkins-pipeline/|Click here to see the jenkins pipeline>\\"
       }" $SLACK_WEBHOOK
       '''
 
@@ -146,7 +147,7 @@ pipeline {
     failure {
       sh '''
       curl -X POST -H 'Content-type: application/json' --data "{
-      \\"text\\": \\"🔥 *FAILURE!* 🔥\\n❌ *Job:* '${JOB_NAME}' #${BUILD_NUMBER}\\n🔍 <${BUILD_URL}|Check what went wrong>\\" 
+      \\"text\\": \\"🔥 *FAILURE!* 🔥\\n❌ *Job:* '${JOB_NAME}' #${BUILD_NUMBER}\\n🔍 JenkinsPipeline <http://${NODE_IP}:${32000}/job/jenkins-pipeline/|Click here to see the jenkins pipeline>\\"
       }" $SLACK_WEBHOOK
       '''
     }
