@@ -139,7 +139,7 @@ pipeline {
     success {
       sh '''
       curl -X POST -H 'Content-type: application/json' --data "{
-      \\"text\\": \\"🎉 *SUCCESS!* 🎉\\n✅ *Job:* '${JOB_NAME}' #${BUILD_NUMBER}\\n🔗 <${URL}|Click here to view the build>\\n JenkinsPipeline <http://${NODE_IP}:${32000}/job/jenkins-pipeline/|Click here to see the jenkins pipeline>\\"
+      \\"text\\": \\"🎉 *SUCCESS!* 🎉\\n✅ *Job:* '${JOB_NAME}' #${BUILD_NUMBER}\\n🔗 <${URL}|Click here to view the build>\\n JenkinsPipeline <http://${NODE_IP}:32000|Click here to see the jenkins pipeline>\\"
       }" $SLACK_WEBHOOK
       '''
 
