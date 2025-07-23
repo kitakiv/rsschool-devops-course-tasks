@@ -7,8 +7,6 @@ pipeline {
         PATH_TO_HELM_PROJECT = "./helmProject/flask-project"
         NAMESPACE = "flask-helm"
         HELM_FOLDER = "flask-project"
-        MINIKUBE_IP = "172.25.145.95"
-        NODE_PORT = "30000"
       }
   stages {
     stage('Build') {
@@ -113,6 +111,11 @@ pipeline {
             mv kubectl /usr/local/bin/
             kubectl version --client
             '''
+            script {
+              def NODE_PORT = sh(script: "kubectl get --namespace ${NAMESPACE} -o jsonpath="{.spec.ports[0].nodePort}" services ${APP_NAME}-${HELM_FOLDER}", returnStdout: true).trim()
+              def NODE_IP = sh(script: "kubectl get nodes --namespace ${NAMESPACE} -o jsonpath="{.items[0].status.addresses[0].address}"", returnStdout: true).trim()
+              env.URL = "http://${NODE_IP}:${NODE_PORT}"
+            }
           }
         }
       }
@@ -121,7 +124,6 @@ pipeline {
       agent any
       steps {
         script {
-          def URL = "http://${MINIKUBE_IP}:${NODE_PORT}"
            sh """
            echo "Running smoke test on: ${URL}"
            sleep 10
