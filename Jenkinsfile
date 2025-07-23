@@ -112,8 +112,8 @@ pipeline {
             kubectl version --client
             '''
             script {
-              def NODE_PORT = sh(script: "kubectl get --namespace ${NAMESPACE} -o jsonpath="{.spec.ports[0].nodePort}" services ${APP_NAME}-${HELM_FOLDER}", returnStdout: true).trim()
-              def NODE_IP = sh(script: "kubectl get nodes --namespace ${NAMESPACE} -o jsonpath="{.items[0].status.addresses[0].address}"", returnStdout: true).trim()
+              def NODE_PORT = sh(script: "kubectl get --namespace ${NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}' services ${APP_NAME}-${HELM_FOLDER}", returnStdout: true).trim()
+              def NODE_IP = sh(script: "kubectl get nodes --namespace ${NAMESPACE} -o jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
               env.URL = "http://${NODE_IP}:${NODE_PORT}"
             }
           }
@@ -127,7 +127,7 @@ pipeline {
            sh """
            echo "Running smoke test on: ${URL}"
            sleep 10
-           curl --fail --retry 5 --retry-delay 5 ${URL}
+           curl --fail --retry 3 --retry-delay 3 ${URL}
            """
         }
       }
