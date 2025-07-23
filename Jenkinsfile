@@ -100,7 +100,7 @@ pipeline {
               mkdir -p ~/.kube
               rm -f ~/.kube/config
               cp "$KUBECONFIG_FILE" ~/.kube/config
-              kubectl get pods -n jenkins-helm
+              helm --help
             '''
           }
         }
