@@ -1,5 +1,13 @@
 pipeline {
   agent none
+  environment {
+        REGISTRY = "docker.io"
+        RELEASE = "1.0.${BUILD_NUMBER}"
+        APP_NAME = "python-app"
+        PATH_TO_HELM_PROJECT = "./helmProject/flask-project"
+        NAMESPACE = "flask-helm"
+        HELM_FOLDER = "flask-project"
+      }
   stages {
     stage('Build') {
       agent{
@@ -59,18 +67,13 @@ pipeline {
           yamlFile './jenkins-pods/kaniko-pod.yaml'
         }
       }
-      environment {
-        REGISTRY = "docker.io"
-        RELEASE = "1.0.${BUILD_NUMBER}"
-        APP_NAME = "python-app"
-      }
       steps {
         container('kaniko') {
           withCredentials([usernamePassword(credentialsId: 'docker-registry-token', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
             script {
               def IMAGE = "${DOCKER_USERNAME}/${APP_NAME}:${RELEASE}"
               sh """
-                cd python_app
+                cd ${APP_NAME}
                 /kaniko/executor \
                   --context `pwd` \
                   --dockerfile `pwd`/dockerfile \
@@ -80,8 +83,7 @@ pipeline {
                   --skip-tls-verify \
                   --destination ${REGISTRY}/${IMAGE} \
               """
-              env.IMAGE = "${REGISTRY}/${DOCKER_USERNAME}/${APP_NAME}"
-              env.RELEASE = "${RELEASE}"
+              env.IMAGE = "${REGISTRY}/${DOCKER_USERNAME}/${APP_NAME}:${RELEASE}"
             }
           }
         }
@@ -100,15 +102,30 @@ pipeline {
               mkdir -p ~/.kube
               rm -f ~/.kube/config
               cp "$KUBECONFIG_FILE" ~/.kube/config
-              ls
-              cd helmProject
-              helm upgrade --install python-app ./flask-project \
+              helm upgrade --install ${APP_NAME} ${PATH_TO_HELM_PROJECT} \
             --namespace flask-helm \
             --create-namespace \
-            --set image.repository=${IMAGE}:${RELEASE} \
+            --set image.repository=${IMAGE}
             '''
+
+            def minikubeIp = sh(script: "minikube ip", returnStdout: true).trim()
+            def nodePort = sh(
+                script: "kubectl get svc ${APP_NAME}-${HELM_FOLDER} -n ${NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'",
+                returnStdout: true
+            ).trim()
+            env.URL = "http://${minikubeIp}:${nodePort}"
           }
         }
+      }
+    }
+    stage("Smoke tests") {
+      agent any
+      steps {
+        sh """
+        echo "Running smoke test on: ${URL}"
+        sleep 10
+        curl --fail --retry 5 --retry-delay 5 ${URL}
+        """
       }
     }
   }
