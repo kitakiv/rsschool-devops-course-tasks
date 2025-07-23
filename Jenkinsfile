@@ -98,7 +98,7 @@ pipeline {
            withCredentials([file(credentialsId: 'kubeconfig-dev', variable: 'KUBECONFIG_FILE')]) {
             sh '''
               mkdir -p ~/.kube
-              cp "$KUBECONFIG_FILE" ~/.kube/config
+              cp -f "$KUBECONFIG_FILE" ~/.kube/config
               kubectl get pods
             '''
           }
