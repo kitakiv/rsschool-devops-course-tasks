@@ -121,12 +121,14 @@ pipeline {
       }
     }
     stage("Smoke tests") {
-      agent any
+      agent {
+        kubernetes {
+          label 'default'
+        }
+      }
       steps {
-        script {
-           sh """
-             curl -f ${URL}
-           """
+        container('jnlp'){
+            sh 'curl -f ${URL}'
         }
       }
     }
