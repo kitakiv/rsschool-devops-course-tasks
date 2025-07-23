@@ -11,7 +11,7 @@ spec:
     volumeMounts:
       - name: kubeconfig-volume
         mountPath: /root/.kube
-        readOnly: true
+        readOnly: false
   volumes:
     - name: kubeconfig-volume
       secret:
