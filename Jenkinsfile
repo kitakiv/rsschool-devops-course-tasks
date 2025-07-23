@@ -105,8 +105,7 @@ pipeline {
               helm upgrade --install python-app ./flask-project \
             --namespace flask-helm \
             --create-namespace \
-            --set image.repository=${IMAGE} \
-            --set image.tag=${RELEASE}
+            --set image.repository=${IMAGE}:${RELEASE} \
             '''
           }
         }
