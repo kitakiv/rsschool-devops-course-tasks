@@ -21,7 +21,7 @@ pipeline {
         container('python'){
           sh '''
             python --version
-            cd python_app
+            cd ${APP_NAME}
             pip install -r requirements.txt
             cd ..
           '''
@@ -40,7 +40,7 @@ pipeline {
           sh '''
             python --version
             pip --version
-            cd python_app
+            cd ${APP_NAME}
             pip install -r requirements.txt
             pytest test.py
           '''
