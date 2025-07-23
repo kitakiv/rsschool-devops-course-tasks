@@ -7,6 +7,7 @@ pipeline {
         PATH_TO_HELM_PROJECT = "./helmProject/flask-project"
         NAMESPACE = "flask-helm"
         HELM_FOLDER = "flask-project"
+        SLACK_WEBHOOK = credentials('slack-jenkins')
       }
   stages {
     stage('Build') {
@@ -131,6 +132,23 @@ pipeline {
             sh 'curl -f ${URL}'
         }
       }
+    }
+  }
+   post {
+    success {
+      sh '''
+      curl -X POST -H 'Content-type: application/json' --data "{
+      \\"text\\": \\"🎉 *SUCCESS!* 🎉\\n✅ *Job:* '${JOB_NAME}' #${BUILD_NUMBER}\\n🔗 <${BUILD_URL}|Click here to view the build>\\" 
+      }" $SLACK_WEBHOOK
+      '''
+
+    }
+    failure {
+      sh '''
+      curl -X POST -H 'Content-type: application/json' --data "{
+      \\"text\\": \\"🔥 *FAILURE!* 🔥\\n❌ *Job:* '${JOB_NAME}' #${BUILD_NUMBER}\\n🔍 <${BUILD_URL}|Check what went wrong>\\" 
+      }" $SLACK_WEBHOOK
+      '''
     }
   }
 }
