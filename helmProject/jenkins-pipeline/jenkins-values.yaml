@@ -413,6 +413,18 @@ controller:
     - git:5.7.0
     - configuration-as-code:1971.vf9280461ea_89
     - job-dsl:latest
+    - workflow-job
+    - workflow-aggregator
+    - credentials-binding
+    - blueocean
+    - pipeline-stage-view
+    - durable-task
+    - docker-workflow
+    - ssh-slaves
+    - sonar:2.18
+    - slack:761.v2a_8770f0d169
+    - pipeline-github:2.8-162.382498405fdc
+    - github-pullrequest:0.7.2
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
@@ -989,7 +1001,7 @@ agent:
   workingDir: "/home/jenkins/agent"
   nodeUsageMode: "NORMAL"
   # -- Append Jenkins labels to the agent
-  customJenkinsLabels: []
+  customJenkinsLabels:
   # -- Name of the secret to be used to pull the image
   imagePullSecretName:
   componentName: "jenkins-agent"
@@ -1207,7 +1219,7 @@ agent:
   # controller.JCasC.defaultConfig: true
   # Best reference is https://<jenkins_url>/configuration-as-code/reference#Cloud-kubernetes. The example below creates a python pod template.
   # -- Configures extra pod templates for the default kubernetes cloud
-  podTemplates: {}
+  # podTemplates:
   #  python: |
   #    - name: python
   #      label: jenkins-python

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+spec:
+  restartPolicy: Never
+  containers:
+  - name: kubectl
+    image: alpine/helm:3.14.0
+    command:
+      - cat
+    tty: true
+    volumeMounts:
+      - name: my-kubeconfig
+        mountPath: /root/.kube
+        readOnly: false
+  volumes:
+    - name: my-kubeconfig
