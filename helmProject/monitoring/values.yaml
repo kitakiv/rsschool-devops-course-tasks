@@ -3,8 +3,10 @@ grafana:
     type: NodePort
     nodePort: 30000
     port: 80
-  adminUser: admin
-  adminPassword: prom-operator
+  admin:
+    existingSecret: "grafana-admin-secret"
+    userKey: admin-user
+    passwordKey: admin-password
   serviceMonitor:
     enabled: true
 

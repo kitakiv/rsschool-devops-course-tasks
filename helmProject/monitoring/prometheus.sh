@@ -10,8 +10,12 @@ helm repo update
 echo "📦 Installing Prometheus Helm chart..."
 helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
   --namespace monitoring-helm --create-namespace \
-  -f monitoring.yaml
+  -f values.yaml
 echo "✅ Prometheus Helm chart installed successfully!"
+
+echo "Create secret for grafana"
+
+kubectl apply -f secret.yaml
 
 
 echo "Metrics server"
