@@ -824,35 +824,86 @@ defaultCurlOptions: "-skf"
 ##
 ## dashboards per provider, use provider name as key.
 ##
-dashboards: {}
-  # default:
-  #   some-dashboard:
-  #     json: |
-  #       $RAW_JSON
-  #   custom-dashboard:
-  #     file: dashboards/custom-dashboard.json
-  #   prometheus-stats:
-  #     gnetId: 2
-  #     revision: 2
-  #     datasource: Prometheus
-  #   local-dashboard:
-  #     url: https://example.com/repository/test.json
-  #     curlOptions: "-sLf"
-  #     token: ''
-  #   local-dashboard-base64:
-  #     url: https://example.com/repository/test-b64.json
-  #     token: ''
-  #     b64content: true
-  #   local-dashboard-gitlab:
-  #     url: https://example.com/repository/test-gitlab.json
-  #     gitlabToken: ''
-  #   local-dashboard-bitbucket:
-  #     url: https://example.com/repository/test-bitbucket.json
-  #     bearerToken: ''
-  #   local-dashboard-azure:
-  #     url: https://example.com/repository/test-azure.json
-  #     basic: ''
-  #     acceptHeader: '*/*'
+dashboards:
+  default:
+    flask-dashboard:
+      json: |
+        {
+          "dashboard": {
+           "id": null,
+          "title": "Test Flask Dashboard",
+          "timezone": "browser",
+            "panels": [
+              {
+                "type": "timeseries",
+                "title": "CPU Usage (seconds)",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "rate(process_cpu_seconds_total[5m])",
+                    "legendFormat": "CPU usage",
+                    "interval": ""
+                  }
+                ],
+                "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Memory Usage (bytes)",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "process_resident_memory_bytes",
+                    "legendFormat": "Resident Memory",
+                    "interval": ""
+                  }
+                ],
+                "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Disk Usage (Virtual Memory)",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "process_virtual_memory_bytes",
+                    "legendFormat": "Virtual Memory",
+                    "interval": ""
+                  }
+                ],
+                "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Request Rate",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "rate(flask_app_requests_total[5m])",
+                    "legendFormat": "HTTP requests",
+                    "interval": ""
+                  }
+                ],
+                "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Avg Request Duration (seconds)",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "rate(flask_app_request_duration_seconds_sum[5m]) / rate(flask_app_request_duration_seconds_count[5m])",
+                    "legendFormat": "Latency",
+                    "interval": ""
+                  }
+                ],
+                "gridPos": { "x": 0, "y": 16, "w": 24, "h": 8 }
+              }
+            ],
+            "schemaVersion": 38,
+              "version": 1
+          }
+        }
 
 ## Reference to external ConfigMap per provider. Use provider name as key and ConfigMap name as value.
 ## A provider dashboards must be defined either by external ConfigMaps or in values.yaml, not in both.
@@ -1533,7 +1584,11 @@ imageRenderer:
   # schedulerName: "default-scheduler"
 
   # Extra configmaps to mount in image-renderer pods
-  extraConfigmapMounts: []
+  extraConfigmapMounts:
+    - name: prometheus-alert-rules
+      mountPath: /etc/config/alert-rules.yml
+      subPath: alert-rules.yaml
+      readOnly: true
 
   # Extra secrets to mount in image-renderer pods
   extraSecretMounts: []

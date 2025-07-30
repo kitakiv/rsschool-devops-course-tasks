@@ -134,6 +134,30 @@ pipeline {
         }
       }
     }
+    stage('Monitoring set up grafana and prometheus') {
+      agent{
+        kubernetes {
+          yamlFile './jenkins-pods/helm-pod.yaml'
+        }
+      }
+      steps {
+        container('kubectl') {
+           withCredentials([file(credentialsId: 'kubeconfig-dev', variable: 'KUBECONFIG_FILE')]) {
+            sh '''
+              mkdir -p ~/.kube
+              rm -f ~/.kube/config
+              cp "$KUBECONFIG_FILE" ~/.kube/config
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+              chmod +x kubectl
+              mv kubectl /usr/local/bin/
+              kubectl version --client
+              cd ./helmProject/monitoring-helm
+              ./monitoring.sh
+            '''
+          }
+        }
+      }
+    }
   }
    post {
     success {

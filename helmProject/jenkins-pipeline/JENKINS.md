@@ -186,6 +186,10 @@ https://kubernetes.io/docs/tasks/tools/install-kubectl/
   ~/.kube/config
   ```
 
+```bash
+kubectl config view --raw --flatten --minify > kubeconfig-embedded.yaml
+```
+
 copy the config file
 
 Paste to kubectl credential

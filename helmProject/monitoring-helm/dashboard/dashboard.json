@@ -1,0 +1,76 @@
+{
+    "dashboard": {
+     "id": null,
+    "title": "Test Flask Dashboard",
+    "timezone": "browser",
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "CPU Usage (seconds)",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(process_cpu_seconds_total[5m])",
+              "legendFormat": "CPU usage",
+              "interval": ""
+            }
+          ],
+          "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Memory Usage (bytes)",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "process_resident_memory_bytes",
+              "legendFormat": "Resident Memory",
+              "interval": ""
+            }
+          ],
+          "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Disk Usage (Virtual Memory)",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "process_virtual_memory_bytes",
+              "legendFormat": "Virtual Memory",
+              "interval": ""
+            }
+          ],
+          "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Request Rate",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(flask_app_requests_total[5m])",
+              "legendFormat": "HTTP requests",
+              "interval": ""
+            }
+          ],
+          "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
+        },
+        {
+          "type": "timeseries",
+          "title": "Avg Request Duration (seconds)",
+          "datasource": "Prometheus",
+          "targets": [
+            {
+              "expr": "rate(flask_app_request_duration_seconds_sum[5m]) / rate(flask_app_request_duration_seconds_count[5m])",
+              "legendFormat": "Latency",
+              "interval": ""
+            }
+          ],
+          "gridPos": { "x": 0, "y": 16, "w": 24, "h": 8 }
+        }
+      ],
+      "schemaVersion": 38,
+        "version": 1
+    }
+  }
