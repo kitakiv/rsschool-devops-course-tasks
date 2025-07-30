@@ -1,0 +1,18 @@
+server:
+  service:
+    type: NodePort
+    port: 9090
+    targetPort: 9090
+
+  global:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+
+pushgateway:
+  enabled: true
+
+alertmanager:
+  enabled: true
+
+nodeExporter:
+  enabled: true

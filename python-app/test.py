@@ -5,3 +5,8 @@ def test_hello():
     response = client.get('/')
     assert response.status_code == 200
     assert response.data.decode() == 'Hello, World!'
+
+def test_metrics():
+    client = app.test_client()
+    response = client.get('/metrics')
+    assert response.status_code == 200
