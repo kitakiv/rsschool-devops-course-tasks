@@ -155,8 +155,9 @@ pipeline {
               echo "Installing Prometheus Helm chart..."
               helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
               helm repo update
+              kubectl get configmap prometheus-alert-rules -n monitoring-helm >/dev/null 2>&1 || \
               kubectl create configmap prometheus-alert-rules \
-                --from-file=alert-rules.yaml=alert-rules.yaml -n monitoring-helm
+              --from-file=alert-rules.yaml=alert-rules.yaml -n monitoring-helm
               echo "Install Prometheus"
               helm upgrade  --install prometheus prometheus-community/prometheus -f prometheus-values.yaml -n monitoring-helm --create-namespace
               echo "Create secret for Grafana..."
