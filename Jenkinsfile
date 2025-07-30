@@ -152,7 +152,20 @@ pipeline {
               mv kubectl /usr/local/bin/
               kubectl version --client
               cd ./helmProject/monitoring-helm
-              ./monitoring.sh
+              echo "Installing Prometheus Helm chart..."
+              helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+              helm repo update
+              kubectl create configmap prometheus-alert-rules \
+                --from-file=alert-rules.yaml=alert-rules.yaml -n monitoring-helm
+              echo "Install Prometheus"
+              helm upgrade  --install prometheus prometheus-community/prometheus -f prometheus-values.yaml -n monitoring-helm --create-namespace
+              echo "Create secret for Grafana..."
+              kubectl apply -f grafana-secret.yaml
+              echo "Installing Grafana Helm Chart..."
+              helm repo add grafana https://grafana.github.io/helm-charts
+              helm repo update
+              echo "Install Grafana"
+              helm upgrade  --install grafana grafana/grafana -f grafana-values.yaml -n monitoring-helm
             '''
           }
         }
